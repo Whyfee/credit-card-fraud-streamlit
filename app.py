@@ -88,30 +88,5 @@ if uploaded_file is not None:
             report = classification_report(y_true, y_pred, output_dict=True)
             st.json(report)
 
-        # === SHAP Explainability ===
-        st.subheader("🧠 Penjelasan Prediksi dengan SHAP")
-
-        shap_button = st.button("🔍 Hitung SHAP Value untuk Penjelasan")
-
-        if shap_button:
-            with st.spinner("Menghitung SHAP value..."):
-                explainer = shap.TreeExplainer(model)
-                shap_values = explainer.shap_values(X)
-
-            # Pilih baris transaksi untuk dijelaskan
-            selected_index = st.number_input(
-                "Pilih nomor baris transaksi yang ingin dijelaskan:", min_value=0, max_value=len(X)-1, step=1
-            )
-            st.write("Detail transaksi:")
-            st.write(X.iloc[selected_index])
-
-            st.write("Prediksi model:", "Fraud" if y_pred[selected_index] == 1 else "Normal")
-
-
-            st.write("🔎 Fitur yang paling berpengaruh terhadap prediksi:")
-            shap.initjs()
-            shap.summary_plot(shap_values[1], X, plot_type="bar", max_display=10, show=False)
-            st.pyplot(bbox_inches='tight')
-
     except Exception as e:
         st.error(f"❌ Terjadi kesalahan saat membaca atau memproses file: {e}")
