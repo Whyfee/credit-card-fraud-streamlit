@@ -107,7 +107,7 @@ if uploaded_file is not None:
 
             st.write("Prediksi model:", "Fraud" if y_pred[selected_index] == 1 else "Normal")
 
-            st.set_option('deprecation.showPyplotGlobalUse', False)
+
             st.write("🔎 Fitur yang paling berpengaruh terhadap prediksi:")
             shap.initjs()
             shap.summary_plot(shap_values[1], X, plot_type="bar", max_display=10, show=False)
