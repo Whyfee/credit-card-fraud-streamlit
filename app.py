@@ -4,15 +4,11 @@ import joblib
 import requests
 import io
 from sklearn.metrics import classification_report
-import shap
-import matplotlib.pyplot as plt
 
-# === Judul Aplikasi ===
 st.set_page_config(page_title="Deteksi Credit Card Fraud", layout="wide")
 st.title("💳 Deteksi Credit Card Fraud")
 st.write("Unggah file CSV yang berisi data transaksi untuk mendeteksi apakah ada kecurangan (fraud).")
 
-# === Load model dari Hugging Face ===
 @st.cache_resource
 def load_model():
     url = "https://huggingface.co/stvn1809/fraud-detector/resolve/main/random_forest_best1.pkl"
@@ -48,7 +44,6 @@ def preprocess(df):
 
     return df, y
 
-# === Upload File ===
 uploaded_file = st.file_uploader("📁 Unggah file CSV", type=["csv"])
 
 if uploaded_file is not None:
@@ -57,10 +52,8 @@ if uploaded_file is not None:
         st.subheader("📄 Data Awal")
         st.dataframe(df_raw.head())
 
-        # Preprocessing
         X, y_true = preprocess(df_raw)
 
-        # Cek kecocokan kolom
         model_features = list(model.feature_names_in_)
         missing_cols = [col for col in model_features if col not in X.columns]
         if missing_cols:
@@ -69,7 +62,6 @@ if uploaded_file is not None:
 
         X = X[model_features]
 
-        # Prediksi
         y_pred = model.predict(X)
         df_raw['Prediksi'] = y_pred
         df_raw['Label Prediksi'] = df_raw['Prediksi'].map({0: 'Normal', 1: 'Fraud'})
@@ -82,7 +74,6 @@ if uploaded_file is not None:
         st.success(f"✅ Transaksi Normal: {normal_total}")
         st.error(f"🚨 Transaksi Fraud: {fraud_total}")
 
-        # === Evaluasi Model ===
         if y_true is not None:
             st.subheader("📋 Evaluasi Model (Jika Label Ada)")
             report = classification_report(y_true, y_pred, output_dict=True)
