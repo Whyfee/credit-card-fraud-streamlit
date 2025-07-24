@@ -89,9 +89,9 @@ if uploaded_file is not None:
         shap_values = explainer.shap_values(X)
 
         shap_df = pd.DataFrame({
-            'Fitur': X.columns,
-            'Nilai Fitur': X.iloc[selected_index],
-            'Kontribusi SHAP': shap_values[1][selected_index]
+        'Fitur': list(X.columns),
+        'Nilai Fitur': X.iloc[selected_index].values,
+        'Kontribusi SHAP': shap_values[1][selected_index]
         }).sort_values(by='Kontribusi SHAP', key=abs, ascending=False)
 
         st.write(f"📌 Penjelasan prediksi untuk baris ke-{selected_index}:")
