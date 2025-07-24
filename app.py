@@ -86,12 +86,13 @@ if uploaded_file is not None:
         st.subheader("🔍 Alasan Prediksi untuk Transaksi Tertentu")
         selected_index = st.number_input("Pilih indeks baris transaksi (0 - {})".format(len(X)-1), min_value=0, max_value=len(X)-1, value=0)
 
-        shap_values = explainer.shap_values(X)
+        row = X.iloc[[selected_index]]  # Tetap bentuk dataframe
+        shap_vals = explainer.shap_values(row)
 
         shap_df = pd.DataFrame({
-        'Fitur': list(X.columns),
-        'Nilai Fitur': X.iloc[selected_index].values,
-        'Kontribusi SHAP': shap_values[1][selected_index]
+            'Fitur': X.columns,
+            'Nilai Fitur': row.values.flatten(),
+            'Kontribusi SHAP': shap_vals[1][0]
         }).sort_values(by='Kontribusi SHAP', key=abs, ascending=False)
 
         st.write(f"📌 Penjelasan prediksi untuk baris ke-{selected_index}:")
