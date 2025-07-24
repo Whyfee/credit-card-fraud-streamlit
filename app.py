@@ -4,7 +4,6 @@ import joblib
 import requests
 import io
 from sklearn.metrics import classification_report
-import shap
 
 st.set_page_config(page_title="Deteksi Credit Card Fraud", layout="wide")
 st.title("💳 Deteksi Credit Card Fraud")
@@ -18,7 +17,6 @@ def load_model():
     return model
 
 model = load_model()
-explainer = shap.TreeExplainer(model)
 
 def preprocess(df):
     if 'TransactionDate' in df.columns:
@@ -71,7 +69,7 @@ if uploaded_file is not None:
         df_raw['Probabilitas Fraud (%)'] = (y_proba[:, 1] * 100).round(2)
 
         st.subheader("📊 Hasil Prediksi")
-        st.dataframe(df_raw[['Prediksi', 'Label Prediksi', 'Probabilitas Fraud (%)']].head())
+        st.dataframe(df_raw[['Label Prediksi', 'Probabilitas Fraud (%)']])
 
         fraud_total = (df_raw['Prediksi'] == 1).sum()
         normal_total = (df_raw['Prediksi'] == 0).sum()
@@ -82,23 +80,6 @@ if uploaded_file is not None:
             st.subheader("📋 Evaluasi Model (Jika Label Ada)")
             report = classification_report(y_true, y_pred, output_dict=True)
             st.json(report)
-
-        st.subheader("🔍 Alasan Prediksi untuk Transaksi Tertentu")
-        selected_index = st.number_input("Pilih indeks baris transaksi (0 - {})".format(len(X)-1), min_value=0, max_value=len(X)-1, value=0)
-
-        row = X.iloc[[selected_index]]  # Tetap bentuk dataframe
-        shap_vals = explainer.shap_values(row)
-
-        shap_df = pd.DataFrame({
-            'Fitur': X.columns,
-            'Nilai Fitur': row.values.flatten(),
-            'Kontribusi SHAP': shap_vals[1][0]
-        }).sort_values(by='Kontribusi SHAP', key=abs, ascending=False)
-
-        st.write(f"📌 Penjelasan prediksi untuk baris ke-{selected_index}:")
-        st.dataframe(shap_df.head(5))
-
-        st.info("Kontribusi SHAP menunjukkan seberapa besar pengaruh masing-masing fitur terhadap keputusan model. Nilai positif mendorong prediksi ke arah 'Fraud', sedangkan negatif ke arah 'Normal'.")
 
     except Exception as e:
         st.error(f"❌ Terjadi kesalahan saat membaca atau memproses file: {e}")
